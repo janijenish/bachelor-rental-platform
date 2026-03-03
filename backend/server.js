@@ -3,29 +3,49 @@ const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const cors = require("cors");
 
+// Load environment variables
 dotenv.config();
 
 const app = express();
 
-// Middleware
-app.use(cors());
+/* =========================
+   Middleware
+========================= */
 app.use(express.json());
+app.use(cors());
 
-// Test Route
-app.get("/", (req, res) => {
-  res.send("Bachelor Rental API Running 🚀");
-});
-
-// Connect MongoDB
+/* =========================
+   MongoDB Connection
+========================= */
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
     console.log("MongoDB Connected ✅");
-
-    app.listen(process.env.PORT || 5000, () => {
-      console.log("Server running on port 5000 🚀");
-    });
   })
   .catch((error) => {
-    console.error("MongoDB connection error:", error);
+    console.error("MongoDB Connection Failed ❌", error);
+    process.exit(1);
   });
+
+/* =========================
+   Base Route
+========================= */
+app.get("/", (req, res) => {
+  res.send("Bachelor Rental API Running 🚀");
+});
+
+/* =========================
+   Routes
+========================= */
+const userRoutes = require("./routes/userRoutes");
+
+app.use("/api/users", userRoutes);
+
+/* =========================
+   Start Server
+========================= */
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT} 🚀`);
+});
