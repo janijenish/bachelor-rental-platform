@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const cors = require("cors");
+const propertyRoutes = require("./routes/propertyRoutes");
 
 // Load environment variables
 dotenv.config();
@@ -40,6 +41,7 @@ app.get("/", (req, res) => {
 const userRoutes = require("./routes/userRoutes");
 
 app.use("/api/users", userRoutes);
+app.use("/api/properties", propertyRoutes);
 
 /* =========================
    Start Server
