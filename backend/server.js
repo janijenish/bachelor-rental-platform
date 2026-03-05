@@ -43,6 +43,10 @@ const userRoutes = require("./routes/userRoutes");
 app.use("/api/users", userRoutes);
 app.use("/api/properties", propertyRoutes);
 
+const { errorHandler } = require("./middleware/errorMiddleware");
+
+app.use(errorHandler);
+
 /* =========================
    Start Server
 ========================= */
