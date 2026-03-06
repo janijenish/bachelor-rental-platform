@@ -18,6 +18,10 @@ const propertySchema = new mongoose.Schema(
       required: true,
     },
 
+    image: {
+  type: String,
+},
+
     location: {
       type: String,
       required: true,
