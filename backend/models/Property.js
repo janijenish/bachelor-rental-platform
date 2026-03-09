@@ -4,44 +4,48 @@ const propertySchema = new mongoose.Schema(
   {
     title: {
       type: String,
-      required: true,
-      trim: true,
+      required: true
     },
 
     description: {
       type: String,
-      required: true,
+      required: true
     },
 
     price: {
       type: Number,
-      required: true,
+      required: true
     },
-
-    image: {
-  type: String,
-},
 
     location: {
       type: String,
-      required: true,
+      required: true
     },
 
     bachelorAllowed: {
       type: Boolean,
-      default: true,
+      default: true
     },
 
     furnishing: {
-      type: String,
-      enum: ["furnished", "semi-furnished", "unfurnished"],
-      default: "unfurnished",
+      type: String
+    },
+
+    image: {
+      type: String
     },
 
     postedBy: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: "User"
     },
+
+    interestedUsers: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User"
+      }
+    ]
   },
   { timestamps: true }
 );
