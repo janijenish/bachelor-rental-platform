@@ -7,7 +7,8 @@ const {
   getPropertyById,
   updateProperty,
   deleteProperty,
-  expressInterest
+  expressInterest,
+  getMyProperties
 } = require("../controllers/propertyController");
 
 const { protect, authorizeRoles } = require("../middleware/authMiddleware");
@@ -26,6 +27,9 @@ router.post(
 
 // GET ALL PROPERTIES
 router.get("/", getProperties);
+
+
+// LANDLORD DASHBOARD
 router.get(
   "/my-properties",
   protect,
@@ -63,6 +67,5 @@ router.post(
   authorizeRoles("tenant"),
   expressInterest
 );
-
 
 module.exports = router;
