@@ -26,6 +26,12 @@ router.post(
 
 // GET ALL PROPERTIES
 router.get("/", getProperties);
+router.get(
+  "/my-properties",
+  protect,
+  authorizeRoles("landlord"),
+  getMyProperties
+);
 
 
 // GET SINGLE PROPERTY

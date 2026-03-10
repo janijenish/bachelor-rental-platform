@@ -1,69 +1,35 @@
-const Property = require("../models/Property");
-const cloudinary = require("../utils/cloudinary");
+exports.expressInterest = async (req, res) => {
 
+  const property = await Property.findById(req.params.id);
 
-// CREATE PROPERTY (Landlord only)
-exports.createProperty = async (req, res) => {
-
-  const { title, description, price, location, bachelorAllowed, furnishing } = req.body;
-
-  let imageUrl = "";
-
-  // Upload image if provided
-  if (req.file) {
-
-    const result = await cloudinary.uploader.upload(req.file.path);
-
-    imageUrl = result.secure_url;
-
+  if (!property) {
+    res.status(404);
+    throw new Error("Property not found");
   }
 
-  const property = await Property.create({
-    title,
-    description,
-    price,
-    location,
-    bachelorAllowed,
-    furnishing,
-    image: imageUrl,
+  // Prevent duplicate interest
+  if (property.interestedUsers.includes(req.user._id)) {
+    res.status(400);
+    throw new Error("You already expressed interest in this property");
+  }
+
+  property.interestedUsers.push(req.user._id);
+
+  await property.save();
+
+  res.json({
+    message: "Interest expressed successfully"
+  });
+  exports.getMyProperties = async (req, res) => {
+
+  const properties = await Property.find({
     postedBy: req.user._id
-  });
-
-  res.status(201).json({
-    message: "Property listed successfully 🏠",
-    property
-  });
-
-};
-
-
-
-
-// GET ALL PROPERTIES WITH FILTERING + PAGINATION + SORTING
-exports.getProperties = async (req, res) => {
-
-  const { location, bachelorAllowed, maxPrice, page = 1, limit = 10, sort } = req.query;
-
-  let filter = {};
-
-  if (location) {
-    filter.location = location;
-  }
-
-  if (bachelorAllowed) {
-    filter.bachelorAllowed = bachelorAllowed === "true";
-  }
-
-  if (maxPrice) {
-    filter.price = { $lte: maxPrice };
-  }
-
-  const properties = await Property.find(filter)
-    .populate("postedBy", "name email")
-    .sort(sort)
-    .limit(limit * 1)
-    .skip((page - 1) * limit);
+  })
+  .populate("interestedUsers", "name email")
+  .populate("postedBy", "name email");
 
   res.json(properties);
+
+};
 
 };
