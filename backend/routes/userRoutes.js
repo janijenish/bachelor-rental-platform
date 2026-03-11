@@ -6,6 +6,12 @@ const {
   loginUser,
   getProfile
 } = require("../controllers/userController");
+router.get(
+  "/saved-properties",
+  protect,
+  authorizeRoles("tenant"),
+  getSavedProperties
+);
 
 const { protect } = require("../middleware/authMiddleware");
 

@@ -25,6 +25,12 @@ const userSchema = new mongoose.Schema(
       enum: ["tenant", "landlord", "admin"],
       default: "tenant",
     },
+    savedProperties: [
+  {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Property"
+  }
+],
   },
   { timestamps: true }
 );

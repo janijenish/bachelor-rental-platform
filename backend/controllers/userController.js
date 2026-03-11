@@ -79,4 +79,14 @@ exports.getProfile = async (req, res) => {
     user: req.user
   });
 
+  const User = require("../models/User");
+
+exports.getSavedProperties = async (req, res) => {
+
+  const user = await User.findById(req.user._id)
+  .populate("savedProperties");
+
+  res.json(user.savedProperties);
+
+};
 };

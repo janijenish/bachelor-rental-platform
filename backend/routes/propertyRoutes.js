@@ -8,14 +8,16 @@ const {
   updateProperty,
   deleteProperty,
   expressInterest,
-  getMyProperties
+  getMyProperties,
+  saveProperty,
+  removeSavedProperty
 } = require("../controllers/propertyController");
 
 const { protect, authorizeRoles } = require("../middleware/authMiddleware");
 const upload = require("../utils/upload");
 
 
-// CREATE PROPERTY (Landlord only)
+// CREATE PROPERTY
 router.post(
   "/",
   protect,
@@ -38,11 +40,38 @@ router.get(
 );
 
 
+// SAVE PROPERTY
+router.post(
+  "/:id/save",
+  protect,
+  authorizeRoles("tenant"),
+  saveProperty
+);
+
+
+// REMOVE SAVED PROPERTY
+router.delete(
+  "/:id/save",
+  protect,
+  authorizeRoles("tenant"),
+  removeSavedProperty
+);
+
+
+// EXPRESS INTEREST
+router.post(
+  "/:id/interest",
+  protect,
+  authorizeRoles("tenant"),
+  expressInterest
+);
+
+
 // GET SINGLE PROPERTY
 router.get("/:id", getPropertyById);
 
 
-// UPDATE PROPERTY (Landlord only)
+// UPDATE PROPERTY
 router.put(
   "/:id",
   protect,
@@ -51,21 +80,12 @@ router.put(
 );
 
 
-// DELETE PROPERTY (Landlord only)
+// DELETE PROPERTY
 router.delete(
   "/:id",
   protect,
   authorizeRoles("landlord"),
   deleteProperty
-);
-
-
-// TENANT EXPRESS INTEREST
-router.post(
-  "/:id/interest",
-  protect,
-  authorizeRoles("tenant"),
-  expressInterest
 );
 
 module.exports = router;
