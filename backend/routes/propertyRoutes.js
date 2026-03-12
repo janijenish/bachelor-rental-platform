@@ -10,82 +10,31 @@ const {
   expressInterest,
   getMyProperties,
   saveProperty,
-  removeSavedProperty
+  removeSavedProperty,
+  contactLandlord
 } = require("../controllers/propertyController");
 
 const { protect, authorizeRoles } = require("../middleware/authMiddleware");
 const upload = require("../utils/upload");
 
+router.post("/", protect, authorizeRoles("landlord"), upload.single("image"), createProperty);
 
-// CREATE PROPERTY
-router.post(
-  "/",
-  protect,
-  authorizeRoles("landlord"),
-  upload.single("image"),
-  createProperty
-);
-
-
-// GET ALL PROPERTIES
 router.get("/", getProperties);
 
+router.get("/my-properties", protect, authorizeRoles("landlord"), getMyProperties);
 
-// LANDLORD DASHBOARD
-router.get(
-  "/my-properties",
-  protect,
-  authorizeRoles("landlord"),
-  getMyProperties
-);
+router.post("/:id/save", protect, authorizeRoles("tenant"), saveProperty);
 
+router.delete("/:id/save", protect, authorizeRoles("tenant"), removeSavedProperty);
 
-// SAVE PROPERTY
-router.post(
-  "/:id/save",
-  protect,
-  authorizeRoles("tenant"),
-  saveProperty
-);
+router.post("/:id/interest", protect, authorizeRoles("tenant"), expressInterest);
 
+router.post("/:id/contact", protect, authorizeRoles("tenant"), contactLandlord);
 
-// REMOVE SAVED PROPERTY
-router.delete(
-  "/:id/save",
-  protect,
-  authorizeRoles("tenant"),
-  removeSavedProperty
-);
-
-
-// EXPRESS INTEREST
-router.post(
-  "/:id/interest",
-  protect,
-  authorizeRoles("tenant"),
-  expressInterest
-);
-
-
-// GET SINGLE PROPERTY
 router.get("/:id", getPropertyById);
 
+router.put("/:id", protect, authorizeRoles("landlord"), updateProperty);
 
-// UPDATE PROPERTY
-router.put(
-  "/:id",
-  protect,
-  authorizeRoles("landlord"),
-  updateProperty
-);
-
-
-// DELETE PROPERTY
-router.delete(
-  "/:id",
-  protect,
-  authorizeRoles("landlord"),
-  deleteProperty
-);
+router.delete("/:id", protect, authorizeRoles("landlord"), deleteProperty);
 
 module.exports = router;

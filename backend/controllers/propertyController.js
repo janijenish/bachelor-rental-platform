@@ -27,10 +27,9 @@ exports.createProperty = async (req, res) => {
   });
 
   res.status(201).json({
-    message: "Property listed successfully 🏠",
+    message: "Property listed successfully",
     property
   });
-
 };
 
 
@@ -82,7 +81,6 @@ exports.getProperties = async (req, res) => {
     pages: Math.ceil(total / limit),
     properties
   });
-
 };
 
 
@@ -91,7 +89,8 @@ exports.getPropertyById = async (req, res) => {
 
   const property = await Property.findById(req.params.id)
     .populate("postedBy", "name email")
-    .populate("interestedUsers", "name email");
+    .populate("interestedUsers", "name email")
+    .populate("contactRequests.user", "name email");
 
   if (!property) {
     res.status(404);
@@ -99,7 +98,6 @@ exports.getPropertyById = async (req, res) => {
   }
 
   res.json(property);
-
 };
 
 
@@ -115,7 +113,7 @@ exports.updateProperty = async (req, res) => {
 
   if (property.postedBy.toString() !== req.user._id.toString()) {
     res.status(403);
-    throw new Error("Not authorized to update this property");
+    throw new Error("Not authorized");
   }
 
   const { title, description, price, location, bachelorAllowed, furnishing } = req.body;
@@ -127,13 +125,9 @@ exports.updateProperty = async (req, res) => {
   property.bachelorAllowed = bachelorAllowed ?? property.bachelorAllowed;
   property.furnishing = furnishing || property.furnishing;
 
-  const updatedProperty = await property.save();
+  const updated = await property.save();
 
-  res.json({
-    message: "Property updated successfully",
-    property: updatedProperty
-  });
-
+  res.json(updated);
 };
 
 
@@ -149,15 +143,12 @@ exports.deleteProperty = async (req, res) => {
 
   if (property.postedBy.toString() !== req.user._id.toString()) {
     res.status(403);
-    throw new Error("Not authorized to delete this property");
+    throw new Error("Not authorized");
   }
 
   await property.deleteOne();
 
-  res.json({
-    message: "Property deleted successfully"
-  });
-
+  res.json({ message: "Property deleted" });
 };
 
 
@@ -173,17 +164,14 @@ exports.expressInterest = async (req, res) => {
 
   if (property.interestedUsers.includes(req.user._id)) {
     res.status(400);
-    throw new Error("You already expressed interest");
+    throw new Error("Already expressed interest");
   }
 
   property.interestedUsers.push(req.user._id);
 
   await property.save();
 
-  res.json({
-    message: "Interest expressed successfully"
-  });
-
+  res.json({ message: "Interest expressed successfully" });
 };
 
 
@@ -196,7 +184,6 @@ exports.getMyProperties = async (req, res) => {
   .populate("interestedUsers", "name email");
 
   res.json(properties);
-
 };
 
 
@@ -204,6 +191,7 @@ exports.getMyProperties = async (req, res) => {
 exports.saveProperty = async (req, res) => {
 
   const user = await User.findById(req.user._id);
+
   const propertyId = req.params.id;
 
   if (user.savedProperties.includes(propertyId)) {
@@ -215,10 +203,7 @@ exports.saveProperty = async (req, res) => {
 
   await user.save();
 
-  res.json({
-    message: "Property saved successfully"
-  });
-
+  res.json({ message: "Property saved" });
 };
 
 
@@ -235,8 +220,41 @@ exports.removeSavedProperty = async (req, res) => {
 
   await user.save();
 
-  res.json({
-    message: "Property removed from saved list"
+  res.json({ message: "Property removed from saved list" });
+};
+
+
+// CONTACT LANDLORD
+exports.contactLandlord = async (req, res) => {
+
+  const { message } = req.body;
+
+  const property = await Property.findById(req.params.id);
+
+  if (!property) {
+    res.status(404);
+    throw new Error("Property not found");
+  }
+
+  property.contactRequests.push({
+    user: req.user._id,
+    message
   });
 
+  await property.save();
+
+  res.json({ message: "Contact request sent" });
+};
+
+
+// LANDLORD VIEW CONTACT REQUESTS
+exports.getContactRequests = async (req, res) => {
+
+  const properties = await Property.find({
+    postedBy: req.user._id
+  })
+  .populate("contactRequests.user", "name email")
+  .select("title contactRequests");
+
+  res.json(properties);
 };
