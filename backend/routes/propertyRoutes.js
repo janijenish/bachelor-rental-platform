@@ -17,24 +17,91 @@ const {
 const { protect, authorizeRoles } = require("../middleware/authMiddleware");
 const upload = require("../utils/upload");
 
-router.post("/", protect, authorizeRoles("landlord"), upload.single("image"), createProperty);
 
+/* =========================
+   LANDLORD ROUTES
+========================= */
+
+// Create property
+router.post(
+  "/",
+  protect,
+  authorizeRoles("landlord"),
+  upload.single("image"),
+  createProperty
+);
+
+// Landlord dashboard
+router.get(
+  "/my-properties",
+  protect,
+  authorizeRoles("landlord"),
+  getMyProperties
+);
+
+// Update property
+router.put(
+  "/:id",
+  protect,
+  authorizeRoles("landlord"),
+  updateProperty
+);
+
+// Delete property
+router.delete(
+  "/:id",
+  protect,
+  authorizeRoles("landlord"),
+  deleteProperty
+);
+
+
+/* =========================
+   PUBLIC ROUTES
+========================= */
+
+// Get all properties
 router.get("/", getProperties);
 
-router.get("/my-properties", protect, authorizeRoles("landlord"), getMyProperties);
-
-router.post("/:id/save", protect, authorizeRoles("tenant"), saveProperty);
-
-router.delete("/:id/save", protect, authorizeRoles("tenant"), removeSavedProperty);
-
-router.post("/:id/interest", protect, authorizeRoles("tenant"), expressInterest);
-
-router.post("/:id/contact", protect, authorizeRoles("tenant"), contactLandlord);
-
+// Get single property
 router.get("/:id", getPropertyById);
 
-router.put("/:id", protect, authorizeRoles("landlord"), updateProperty);
 
-router.delete("/:id", protect, authorizeRoles("landlord"), deleteProperty);
+/* =========================
+   TENANT ROUTES
+========================= */
+
+// Save property
+router.post(
+  "/:id/save",
+  protect,
+  authorizeRoles("tenant"),
+  saveProperty
+);
+
+// Remove saved property
+router.delete(
+  "/:id/save",
+  protect,
+  authorizeRoles("tenant"),
+  removeSavedProperty
+);
+
+// Express interest
+router.post(
+  "/:id/interest",
+  protect,
+  authorizeRoles("tenant"),
+  expressInterest
+);
+
+// Contact landlord
+router.post(
+  "/:id/contact",
+  protect,
+  authorizeRoles("tenant"),
+  contactLandlord
+);
+
 
 module.exports = router;

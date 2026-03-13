@@ -2,7 +2,14 @@ const express = require("express");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const cors = require("cors");
+const helmet = require("helmet");
+
+// Routes
+const userRoutes = require("./routes/userRoutes");
 const propertyRoutes = require("./routes/propertyRoutes");
+
+// Error Middleware
+const { errorHandler } = require("./middleware/errorMiddleware");
 
 // Load environment variables
 dotenv.config();
@@ -10,13 +17,18 @@ dotenv.config();
 const app = express();
 
 /* =========================
-   Middleware
+Security Middleware
+========================= */
+app.use(helmet());
+
+/* =========================
+General Middleware
 ========================= */
 app.use(express.json());
 app.use(cors());
 
 /* =========================
-   MongoDB Connection
+MongoDB Connection
 ========================= */
 mongoose
   .connect(process.env.MONGO_URI)
@@ -29,26 +41,35 @@ mongoose
   });
 
 /* =========================
-   Base Route
+Base Route
 ========================= */
 app.get("/", (req, res) => {
   res.send("Bachelor Rental API Running 🚀");
 });
 
 /* =========================
-   Routes
+API Routes
 ========================= */
-const userRoutes = require("./routes/userRoutes");
-
 app.use("/api/users", userRoutes);
 app.use("/api/properties", propertyRoutes);
 
-const { errorHandler } = require("./middleware/errorMiddleware");
+/* =========================
+404 Handler
+========================= */
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    message: "Route not found"
+  });
+});
 
+/* =========================
+Global Error Handler
+========================= */
 app.use(errorHandler);
 
 /* =========================
-   Start Server
+Start Server
 ========================= */
 const PORT = process.env.PORT || 5000;
 

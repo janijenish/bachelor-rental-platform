@@ -32,13 +32,12 @@ exports.registerUser = async (req, res) => {
 };
 
 
-
 // LOGIN USER
 exports.loginUser = async (req, res) => {
 
   const { email, password } = req.body;
 
-  const user = await User.findOne({ email });
+  const user = await User.findOne({ email }).select("+password");
 
   if (!user) {
     res.status(401);
@@ -70,7 +69,6 @@ exports.loginUser = async (req, res) => {
 };
 
 
-
 // GET PROFILE (Protected)
 exports.getProfile = async (req, res) => {
 
@@ -79,14 +77,15 @@ exports.getProfile = async (req, res) => {
     user: req.user
   });
 
-  const User = require("../models/User");
+};
 
+
+// GET SAVED PROPERTIES
 exports.getSavedProperties = async (req, res) => {
 
   const user = await User.findById(req.user._id)
-  .populate("savedProperties");
+    .populate("savedProperties");
 
   res.json(user.savedProperties);
 
-};
 };

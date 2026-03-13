@@ -5,18 +5,32 @@ const {
   registerUser,
   loginUser,
   getProfile,
-  getSavedProperties,
-  getContactRequests
+  getSavedProperties
 } = require("../controllers/userController");
+
+const { getContactRequests } = require("../controllers/propertyController");
 
 const { protect, authorizeRoles } = require("../middleware/authMiddleware");
 
 
-router.post("/register", registerUser);
+/* =========================
+   AUTH ROUTES
+========================= */
 
+router.post("/register", registerUser);
 router.post("/login", loginUser);
 
+
+/* =========================
+   USER PROFILE
+========================= */
+
 router.get("/profile", protect, getProfile);
+
+
+/* =========================
+   TENANT FEATURES
+========================= */
 
 router.get(
   "/saved-properties",
@@ -25,11 +39,17 @@ router.get(
   getSavedProperties
 );
 
+
+/* =========================
+   LANDLORD FEATURES
+========================= */
+
 router.get(
   "/contact-requests",
   protect,
   authorizeRoles("landlord"),
   getContactRequests
 );
+
 
 module.exports = router;
