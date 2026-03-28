@@ -11,14 +11,13 @@ const Navbar = () => {
   };
 
   return (
-
     <div className="bg-white shadow-md px-6 py-3 flex justify-between items-center">
 
       <Link to="/" className="text-xl font-bold">
         🏠 Rentals
       </Link>
 
-      <div className="flex gap-4">
+      <div className="flex gap-4 items-center">
 
         {!token ? (
           <>
@@ -27,6 +26,8 @@ const Navbar = () => {
           </>
         ) : (
           <>
+            <Link to="/saved">Saved ❤️</Link>
+
             <button
               onClick={handleLogout}
               className="bg-red-500 text-white px-3 py-1 rounded"
@@ -39,9 +40,7 @@ const Navbar = () => {
       </div>
 
     </div>
-
   );
-
 };
 
 export default Navbar;
